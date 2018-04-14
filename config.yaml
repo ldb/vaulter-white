@@ -1,0 +1,11 @@
+command: ["bash", "-c", "env"]
+host: http://vault.rocks:8200
+roleId: myAppRole
+secretId: mySecretId
+secretIdEnv: SECRET_ID
+secretMount: /secret/service/awesomeApp/
+secrets:
+  apnConfig:
+    key: APN_KEY
+    keyId: APN_KEYID
+    teamId: APN_TEAMID
