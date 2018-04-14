@@ -4,7 +4,7 @@ A tool to pass Vault secrets to other processes via environment variables.
 ## About
 vaulter-white reads secrets from [Vault](https://vaultproject.io) and passes them into a newly spawned process using environment variables.
 It is particularly useful in containerized applications. For example it can be set as the `ENTRYPOINT` in a Docker container to retrieve production Keys for your App.
-After loading the secrets into the environment (while also including all exisiting vairables) it will replace itself with a freshly spawned instance of the configurable process.
+After loading the secrets into the environment (while also including all existing variables) it will replace itself with a freshly spawned instance of the configurable process.
 
 _Note:_ At the moment only [AppRole](https://www.vaultproject.io/docs/auth/approle.html) authentication is supported.
 
@@ -30,12 +30,12 @@ secrets:                                  # secrets is a collection of environme
 ```
 
 - `command` is optional and can be passed as command line argument as well (for example: `vaulter-white -c config.yaml bash -c env`).
-- `secretId` will be read from environment variables (eihter at `secretIdEnv` as configured or at `VAULT_SECRET_ID`) if not configured. This makes it easy to include vaulter-white in Docker images that are built by CI.
+- `secretId` will be read from environment variables (either at `secretIdEnv` as configured or at `VAULT_SECRET_ID`) if not configured. This makes it easy to include vaulter-white in Docker images that are built by CI.
 - `secrets` is optional as well. Any keys not listed there will be exported as `SECRETNAME_KEY=value`.
 
-_Note:_ Secret values should always store flat data types and no marshalled data (e.g JSON Objects). Values that are not strings will be exported as JSON.
+_Note:_ Secret values should always store flat data types and no marshaled data (e.g JSON Objects). Values that are not strings will be exported as JSON.
 
 ## Run
 
 To pass the configuration use the `-c` flag: `vaulter-white -c configuration.yaml`
-If no command was specified in the configuration it should be passed as a commandline argumant: `vaulter-white -c config.yaml bash -c env`
+If no command was specified in the configuration it should be passed as a commandline argument: `vaulter-white -c config.yaml bash -c env`
