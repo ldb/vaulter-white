@@ -8,6 +8,8 @@ import (
 	"os"
 	"os/exec"
 	"strings"
+	"github.com/cosmonawt/vaulter-white/vault"
+	"github.com/cosmonawt/vaulter-white/conf"
 )
 
 func init() {
@@ -28,7 +30,7 @@ func main() {
 	}
 	defer file.Close()
 
-	config, err := LoadConfig(file)
+	config, err := conf.LoadConfig(file)
 	if err != nil {
 		log.Fatal("Could not load config: ", err)
 	}
@@ -42,8 +44,8 @@ func main() {
 		log.Fatal("No Command provided. Please specify in config or provide as argument!")
 	}
 
-	vr := VaultAppRole{RoleId: config.RoleID, SecretId: config.SecretId}
-	v := Vault{Hostname: config.Host, AccessToken: config.Token, AppRole: vr}
+	vr := vault.VaultAppRole{RoleId: config.RoleID, SecretId: config.SecretId}
+	v := vault.Vault{Hostname: config.Host, AccessToken: config.Token, AppRole: vr}
 
 	err = v.GetAccessToken()
 	if err != nil {
@@ -55,7 +57,7 @@ func main() {
 		log.Fatal("Error listing secrets: ", err)
 	}
 
-	var secrets = make(map[string]VaultSecretData)
+	var secrets = make(map[string]vault.VaultSecretData)
 	for _, s := range list {
 		secret, err := v.GetSecret(s)
 		if err != nil {
@@ -72,7 +74,7 @@ func main() {
 	unix.Exec(binary, command, environment)
 }
 
-func PrepareEnvironment(secrets map[string]VaultSecretData, config Config) []string {
+func PrepareEnvironment(secrets map[string]vault.VaultSecretData, config conf.Config) []string {
 	environment := os.Environ()
 	for name, secret := range secrets {
 		for sk, sv := range secret {

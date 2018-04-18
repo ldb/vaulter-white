@@ -4,10 +4,12 @@ import (
 	"github.com/stretchr/testify/assert"
 	"os"
 	"testing"
+	"github.com/cosmonawt/vaulter-white/conf"
+	"github.com/cosmonawt/vaulter-white/vault"
 )
 
 func TestPrepareEnvironment(t *testing.T) {
-	config := Config{
+	config := conf.Config{
 		SecretPaths: map[string]map[string]string{
 			"testSecret1": {
 				"testKey1": "TEST_VAL1",
@@ -15,7 +17,7 @@ func TestPrepareEnvironment(t *testing.T) {
 		},
 	}
 
-	secrets := map[string]VaultSecretData{
+	secrets := map[string]vault.VaultSecretData{
 		"testSecret1": {
 			"testKey1": "TestValue1",
 			"testKey2": "TestValue2",
