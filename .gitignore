@@ -1,5 +1,6 @@
 # Created by https://www.gitignore.io/api/go,macos
 .idea/
+vendor/
 
 ### Go ###
 # Binaries for programs and plugins
