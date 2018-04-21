@@ -13,7 +13,7 @@ func TestVault_GetAccessToken(t *testing.T) {
 		assert.Equal(t, "POST", r.Method, "HTTP Method should be correct")
 		assert.Equal(t, "/v1/auth/approle/login", r.RequestURI, "URI should be correct")
 
-		login := VaultAppRole{}
+		login := AppRole{}
 		d := json.NewDecoder(r.Body)
 		d.Decode(&login)
 
@@ -29,7 +29,7 @@ func TestVault_GetAccessToken(t *testing.T) {
 	}))
 	defer ts.Close()
 
-	ar := VaultAppRole{RoleId: "roleId", SecretId: "secretId"}
+	ar := AppRole{RoleId: "roleId", SecretId: "secretId"}
 	v := Vault{Hostname: ts.URL, AppRole: ar}
 
 	v.GetAccessToken()
@@ -50,7 +50,7 @@ func TestVault_ListSecrets(t *testing.T) {
 	}))
 	defer ts.Close()
 
-	ar := VaultAppRole{RoleId: "roleId", SecretId: "secretId"}
+	ar := AppRole{RoleId: "roleId", SecretId: "secretId"}
 	v := Vault{Hostname: ts.URL, AppRole: ar, AccessToken: "accessToken"}
 
 	s, err := v.ListSecrets()
@@ -74,13 +74,13 @@ func TestVault_GetSecret(t *testing.T) {
 	}))
 	defer ts.Close()
 
-	ar := VaultAppRole{RoleId: "roleId", SecretId: "secretId"}
+	ar := AppRole{RoleId: "roleId", SecretId: "secretId"}
 	v := Vault{Hostname: ts.URL, AppRole: ar, AccessToken: "accessToken"}
 
 	s, err := v.GetSecret("testSecret1")
 	assert.Nil(t, err, "should not produce error")
 
-	expected := VaultSecretData{
+	expected := SecretData{
 		"secretKey1": "secretValue1",
 		"secretKey2": `{"secretKey2Sub1":"secret2Sub1Value"}`,
 		"secretKey3": "[\"1\",2]",

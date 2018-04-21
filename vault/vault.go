@@ -10,30 +10,30 @@ import (
 type Vault struct {
 	Hostname    string
 	AccessToken string
-	AppRole     VaultAppRole
+	AppRole     AppRole
 }
 
-type VaultAppRole struct {
+type AppRole struct {
 	RoleId   string `json:"role_id"`
 	SecretId string `json:"secret_id"`
 }
 
-type VaultSecret struct {
+type Secret struct {
 	RequestID     string                     `json:"request_id"`
 	LeaseID       string                     `json:"lease_id"`
 	Renewable     bool                       `json:"renewable"`
 	LeaseDuration int                        `json:"lease_duration"`
-	Auth          VaultAuth                  `json:"auth"`
+	Auth          Auth                       `json:"auth"`
 	Data          map[string]json.RawMessage `json:"data"`
 }
 
-type VaultAuth struct {
+type Auth struct {
 	ClientToken string   `json:"client_token"`
 	Accessor    string   `json:"accessor"`
 	Policies    []string `json:"policies"`
 }
 
-type VaultSecretData map[string]string
+type SecretData map[string]string
 
 func (v *Vault) GetAccessToken() error {
 	p, err := json.Marshal(v.AppRole)
@@ -50,7 +50,7 @@ func (v *Vault) GetAccessToken() error {
 	return nil
 }
 
-func (v Vault) GetSecret(secretName string) (secret VaultSecretData, err error) {
+func (v Vault) GetSecret(secretName string) (secret SecretData, err error) {
 	p := fmt.Sprintf("%s%s/%s", "/v1/secret/service/", v.AppRole.RoleId, secretName)
 
 	r, err := v.makeRequest("GET", p, "")
@@ -89,12 +89,12 @@ func (v Vault) ListSecrets() (secrets []string, err error) {
 	return secretList, nil
 }
 
-func (v Vault) makeRequest(requestType string, path string, params string) (response VaultSecret, err error) {
+func (v Vault) makeRequest(requestType string, path string, params string) (response Secret, err error) {
 	url := fmt.Sprintf("%s%s", v.Hostname, path)
 
 	req, err := http.NewRequest(requestType, url, bytes.NewBufferString(params))
 	if err != nil {
-		return VaultSecret{}, err
+		return Secret{}, err
 	}
 
 	if v.AccessToken != "" {
@@ -105,20 +105,20 @@ func (v Vault) makeRequest(requestType string, path string, params string) (resp
 
 	r, err := client.Do(req)
 	if err != nil {
-		return VaultSecret{}, err
+		return Secret{}, err
 	}
 	defer r.Body.Close()
 
 	if r.StatusCode != 200 {
-		return VaultSecret{}, fmt.Errorf("bad response code %d", r.StatusCode)
+		return Secret{}, fmt.Errorf("bad response code %d %s", r.StatusCode, r.Body)
 	}
 
-	vaultResponse := VaultSecret{}
+	vaultResponse := Secret{}
 
 	d := json.NewDecoder(r.Body)
 	d.Decode(&vaultResponse)
 	if err != nil {
-		return VaultSecret{}, err
+		return Secret{}, err
 	}
 
 	return vaultResponse, nil
