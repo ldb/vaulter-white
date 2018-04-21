@@ -17,7 +17,7 @@ func TestPrepareEnvironment(t *testing.T) {
 		},
 	}
 
-	secrets := map[string]vault.VaultSecretData{
+	secrets := map[string]vault.SecretData{
 		"testSecret1": {
 			"testKey1": "TestValue1",
 			"testKey2": "TestValue2",

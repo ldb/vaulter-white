@@ -26,13 +26,13 @@ func main() {
 
 	file, err := os.Open(*c)
 	if err != nil {
-		log.Fatal("Could not open config: ", err)
+		log.Fatal("could not open config: ", err)
 	}
 	defer file.Close()
 
 	config, err := conf.LoadConfig(file)
 	if err != nil {
-		log.Fatal("Could not load config: ", err)
+		log.Fatal("could not load config: ", err)
 	}
 
 	command := config.Command
@@ -44,24 +44,24 @@ func main() {
 		log.Fatal("No Command provided. Please specify in config or provide as argument!")
 	}
 
-	vr := vault.VaultAppRole{RoleId: config.RoleID, SecretId: config.SecretId}
+	vr := vault.AppRole{RoleId: config.RoleID, SecretId: config.SecretId}
 	v := vault.Vault{Hostname: config.Host, AccessToken: config.Token, AppRole: vr}
 
 	err = v.GetAccessToken()
 	if err != nil {
-		log.Fatal("Authentication Error: ", err)
+		log.Fatal("authentication Error: ", err)
 	}
 
 	list, err := v.ListSecrets()
 	if err != nil {
-		log.Fatal("Error listing secrets: ", err)
+		log.Fatal("error listing secrets: ", err)
 	}
 
-	var secrets = make(map[string]vault.VaultSecretData)
+	var secrets = make(map[string]vault.SecretData)
 	for _, s := range list {
 		secret, err := v.GetSecret(s)
 		if err != nil {
-			log.Fatal("Error getting secret: ", err)
+			log.Fatal("error getting secret: ", err)
 		}
 		secrets[s] = secret
 	}
@@ -69,12 +69,12 @@ func main() {
 	environment := PrepareEnvironment(secrets, config)
 	binary, err := exec.LookPath(command[0])
 	if err != nil {
-		log.Fatal("Command not found: ", err)
+		log.Fatal("command not found: ", err)
 	}
 	unix.Exec(binary, command, environment)
 }
 
-func PrepareEnvironment(secrets map[string]vault.VaultSecretData, config conf.Config) []string {
+func PrepareEnvironment(secrets map[string]vault.SecretData, config conf.Config) []string {
 	environment := os.Environ()
 	for name, secret := range secrets {
 		for sk, sv := range secret {
