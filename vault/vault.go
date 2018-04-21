@@ -86,12 +86,6 @@ func (v Vault) ListSecrets() (secrets []string, err error) {
 		return secrets, fmt.Errorf("error listing secrets")
 	}
 
-	/*secrets = make([]string, len(secretList))
-
-	for k, s := range secretList {
-		secrets[k] = s.(string)
-	}*/
-
 	return secretList, nil
 }
 
