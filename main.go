@@ -3,13 +3,14 @@ package main
 import (
 	"flag"
 	"fmt"
+	"github.com/cosmonawt/vaulter-white/conf"
+	"github.com/cosmonawt/vaulter-white/vault"
 	"golang.org/x/sys/unix"
 	"log"
 	"os"
 	"os/exec"
 	"strings"
-	"github.com/cosmonawt/vaulter-white/vault"
-	"github.com/cosmonawt/vaulter-white/conf"
+	"sync"
 )
 
 func init() {
@@ -57,21 +58,40 @@ func main() {
 		log.Fatal("error listing secrets: ", err)
 	}
 
-	var secrets = make(map[string]vault.SecretData)
+	secrets := secretList{secrets: map[string]vault.SecretData{}}
+
 	for _, s := range list {
-		secret, err := v.GetSecret(s)
-		if err != nil {
-			log.Fatal("error getting secret: ", err)
-		}
-		secrets[s] = secret
+		secrets.Add(1)
+		go func(s string) {
+			secret, err := v.GetSecret(s)
+			if err != nil {
+				log.Fatal("error getting secret: ", err)
+			}
+			secrets.add(s, secret)
+			secrets.Done()
+		}(s)
 	}
 
-	environment := PrepareEnvironment(secrets, config)
+	secrets.Wait()
+
+	environment := PrepareEnvironment(secrets.secrets, config)
 	binary, err := exec.LookPath(command[0])
 	if err != nil {
 		log.Fatal("command not found: ", err)
 	}
 	unix.Exec(binary, command, environment)
+}
+
+type secretList struct {
+	sync.Mutex
+	sync.WaitGroup
+	secrets map[string]vault.SecretData
+}
+
+func (s secretList) add(name string, secretData vault.SecretData) {
+	s.Lock()
+	defer s.Unlock()
+	s.secrets[name] = secretData
 }
 
 func PrepareEnvironment(secrets map[string]vault.SecretData, config conf.Config) []string {
