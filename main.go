@@ -58,7 +58,7 @@ func main() {
 		log.Fatal("error listing secrets: ", err)
 	}
 
-	secrets := secretList{secrets: map[string]vault.SecretData{}}
+	secrets := &secretList{secrets: map[string]vault.SecretData{}}
 
 	for _, s := range list {
 		secrets.Add(1)
@@ -88,7 +88,7 @@ type secretList struct {
 	secrets map[string]vault.SecretData
 }
 
-func (s secretList) add(name string, secretData vault.SecretData) {
+func (s *secretList) add(name string, secretData vault.SecretData) {
 	s.Lock()
 	defer s.Unlock()
 	s.secrets[name] = secretData
