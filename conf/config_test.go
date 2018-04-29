@@ -2,9 +2,9 @@ package conf
 
 import (
 	"github.com/stretchr/testify/assert"
+	"os"
 	"strings"
 	"testing"
-	"os"
 )
 
 func TestLoadConfig(t *testing.T) {
@@ -36,7 +36,7 @@ secretId: "testSecret"`
 host: "testHost"
 some: "nonsensfield"
 secretIdEnv: "SECRET"`
-os.Setenv("SECRET","testSecret")
+	os.Setenv("SECRET", "testSecret")
 
 	config, err = LoadConfig(strings.NewReader(c))
 	assert.Nil(t, err)
@@ -46,7 +46,7 @@ os.Setenv("SECRET","testSecret")
 	c = `
 host: "testHost"
 some: "nonsensfield"`
-	os.Setenv("VAULT_SECRET_ID","testSecret")
+	os.Setenv("VAULT_SECRET_ID", "testSecret")
 
 	config, err = LoadConfig(strings.NewReader(c))
 	assert.Nil(t, err)

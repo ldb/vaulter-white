@@ -1,11 +1,11 @@
 package main
 
 import (
+	"github.com/cosmonawt/vaulter-white/conf"
+	"github.com/cosmonawt/vaulter-white/vault"
 	"github.com/stretchr/testify/assert"
 	"os"
 	"testing"
-	"github.com/cosmonawt/vaulter-white/conf"
-	"github.com/cosmonawt/vaulter-white/vault"
 )
 
 func TestPrepareEnvironment(t *testing.T) {
