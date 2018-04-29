@@ -2,6 +2,7 @@
 A tool to pass Vault secrets to other processes via environment variables.
 
 [![Build Status](https://travis-ci.org/cosmonawt/vaulter-white.svg?branch=master)](https://travis-ci.org/cosmonawt/vaulter-white)
+[![Go Report Card](https://goreportcard.com/badge/github.com/cosmonawt/vaulter-white)](https://goreportcard.com/report/github.com/cosmonawt/vaulter-white)
 
 ## About
 vaulter-white reads secrets from [Vault](https://vaultproject.io) and passes them into a newly spawned process using environment variables.
