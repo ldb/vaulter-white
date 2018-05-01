@@ -61,18 +61,18 @@ func main() {
 	secrets := &secretList{secrets: map[string]vault.SecretData{}}
 
 	for _, s := range list {
-		secrets.Add(1)
+		secrets.w.Add(1)
 		go func(s string) {
 			secret, err := v.GetSecret(s)
 			if err != nil {
 				log.Fatal("error getting secret: ", err)
 			}
 			secrets.add(s, secret)
-			secrets.Done()
+			secrets.w.Done()
 		}(s)
 	}
 
-	secrets.Wait()
+	secrets.w.Wait()
 
 	environment := PrepareEnvironment(secrets.secrets, config)
 	binary, err := exec.LookPath(command[0])
@@ -83,14 +83,14 @@ func main() {
 }
 
 type secretList struct {
-	sync.Mutex
-	sync.WaitGroup
+	m       sync.Mutex
+	w       sync.WaitGroup
 	secrets map[string]vault.SecretData
 }
 
 func (s *secretList) add(name string, secretData vault.SecretData) {
-	s.Lock()
-	defer s.Unlock()
+	s.m.Lock()
+	defer s.m.Unlock()
 	s.secrets[name] = secretData
 }
 
