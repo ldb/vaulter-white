@@ -13,10 +13,6 @@ import (
 	"sync"
 )
 
-func init() {
-
-}
-
 func main() {
 	var c = flag.String("c", "vaulter-white.yaml", "Configuration file")
 	flag.Parse()
