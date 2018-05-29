@@ -57,3 +57,15 @@ some: "nonsensfield"`
 	config, err = LoadConfig(strings.NewReader(c))
 	assert.NotNil(t, err)
 }
+
+func TestSafeLookupEnv(t *testing.T) {
+	os.Setenv("VAULT_HOST", "testHost")
+	os.Setenv("VAULT_HOST_FALLBACK", "testHostFallback")
+
+	env := safeLookupEnv("VAULT_HOST", "VAULT_HOST_FALLBACK")
+	assert.Equal(t, "testHost", env, "should read primary value successfully")
+
+	os.Unsetenv("VAULT_HOST")
+	env = safeLookupEnv("VAULT_HOST", "VAULT_HOST_FALLBACK")
+	assert.Equal(t, "testHostFallback", env, "should read fallback value successfully")
+}

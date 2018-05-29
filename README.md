@@ -16,13 +16,15 @@ vaulter-white is configured via vaulter-white.yaml which will be read from the c
 
 _Example:_
 ```yaml
-command: ["bash", "-c", "env"]            # Specifies the command to run after loading the secrets.
-host: http://vault.rocks:8200             # Host of Vault server.
-roleId: myAppRole                         # RoleID and SecretID for AppRole Authentication in Vault.
-secretId: mySuperSecretId
-secretIdEnv: SECRET_ID                    # The name of an environment variable storing the secretId, if not specified above.
-secretMount: /secret/appConfig/           # secretMount contains the path to the secret backend holding your keys in Vault.
-secrets:                                  # secrets is a collection of environment variable name overrides for each key.
+command: ["bash", "-c", "env"]         # Specifies the command to run after loading the secrets.
+host: http://vault.rocks:8200          # Host of Vault server.
+hostEnv: HOST                          # If "host" is not set, it will be read from this environment variable.
+roleId: myAppRole                      # RoleID for AppRole Authentication in Vault.
+roleIdEnv: ROLE_ID                     # If "roleId" is not set, it will be read from this environment variable.
+secretId: mySuperSecretId              # SecretID for AppRole Authentication in Vault.
+secretIdEnv: SECRET_ID                 # If "secretId" is not set, it will be read from this environment variable.
+secretMount: /secret/appConfig/        # "secretMount" contains the path to the secret backend holding your keys in Vault.
+secrets:                               # "secrets" is a collection of environment variable name overrides for each key.
   awsConfig:
     region: AWS_REGION
     access_key_id: AWS_KEY_ID
@@ -33,7 +35,9 @@ secrets:                                  # secrets is a collection of environme
 ```
 
 - `command` is optional and can be passed as command line argument as well (for example: `vaulter-white -c config.yaml bash -c env`).
-- `secretId` will be read from environment variables (either at `secretIdEnv` as configured or at `VAULT_SECRET_ID`) if not configured. This makes it easy to include vaulter-white in Docker images that are built by CI.
+- `host` will be read from the environment if not set (either by looking at `hostEnv` or using `VAULT_HOST` as a fallback). This makes it easy to include vaulter-white in Docker images that are built by CI.
+- `secretId` will also be read from the environment if not set (either by looking at `secretIdEnv` or using `VAULT_SECRET_ID` as a fallback).
+- `roleId` will also be read from the environment if not set (either by looking at `roleIdEnv` or using `VAULT_ROLE_ID` as a fallback).
 - `secrets` is optional as well. Any keys not listed there will be exported as `SECRETNAME_KEY=value`.
 
 _Note:_ Secret values should always store flat data types and no marshaled data (e.g JSON Objects). Values that are not strings will be exported as JSON.
