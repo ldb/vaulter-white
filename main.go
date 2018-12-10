@@ -42,7 +42,7 @@ func main() {
 	}
 
 	vr := vault.AppRole{RoleId: config.RoleID, SecretId: config.SecretId}
-	v := vault.Vault{Hostname: config.Host, AccessToken: config.Token, AppRole: vr}
+	v := vault.Vault{Hostname: config.Host, AccessToken: config.Token, AppRole: vr, SecretMount: config.SecretMount}
 
 	err = v.GetAccessToken()
 	if err != nil {

@@ -43,7 +43,7 @@ func TestVault_GetAccessToken(t *testing.T) {
 func TestVault_ListSecrets(t *testing.T) {
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, "LIST", r.Method, "HTTP Method should be correct")
-		assert.Equal(t, "/v1/secret/service/roleId", r.RequestURI, "URI should be correct")
+		assert.Equal(t, "/v1/mount/", r.RequestURI, "URI should be correct")
 		assert.Equal(t, "accessToken", r.Header.Get("X-Vault-Token"), "should contain correct Access Token")
 
 		w.Write([]byte(`{"data": {"keys": ["testSecret1", "testSecret2"]}}`))
@@ -51,7 +51,7 @@ func TestVault_ListSecrets(t *testing.T) {
 	defer ts.Close()
 
 	ar := AppRole{RoleId: "roleId", SecretId: "secretId"}
-	v := Vault{Hostname: ts.URL, AppRole: ar, AccessToken: "accessToken"}
+	v := Vault{Hostname: ts.URL, AppRole: ar, AccessToken: "accessToken", SecretMount: "/mount/"}
 
 	s, err := v.ListSecrets()
 	assert.Nil(t, err, "should not produce error")
@@ -67,7 +67,7 @@ func TestVault_ListSecrets(t *testing.T) {
 func TestVault_GetSecret(t *testing.T) {
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, "GET", r.Method, "HTTP Method should be correct")
-		assert.Equal(t, "/v1/secret/service/roleId/testSecret1", r.RequestURI, "URI should be correct")
+		assert.Equal(t, "/v1/mount/testSecret1", r.RequestURI, "URI should be correct")
 		assert.Equal(t, "accessToken", r.Header.Get("X-Vault-Token"), "should contain correct Access Token")
 
 		w.Write([]byte(`{"data": {"secretKey1": "secretValue1", "secretKey2": {"secretKey2Sub1":"secret2Sub1Value"}, "secretKey3": ["1",2]}}`))
@@ -75,7 +75,7 @@ func TestVault_GetSecret(t *testing.T) {
 	defer ts.Close()
 
 	ar := AppRole{RoleId: "roleId", SecretId: "secretId"}
-	v := Vault{Hostname: ts.URL, AppRole: ar, AccessToken: "accessToken"}
+	v := Vault{Hostname: ts.URL, AppRole: ar, AccessToken: "accessToken", SecretMount: "/mount/"}
 
 	s, err := v.GetSecret("testSecret1")
 	assert.Nil(t, err, "should not produce error")

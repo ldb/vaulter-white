@@ -11,6 +11,7 @@ type Vault struct {
 	Hostname    string
 	AccessToken string
 	AppRole     AppRole
+	SecretMount string
 }
 
 type AppRole struct {
@@ -51,7 +52,7 @@ func (v *Vault) GetAccessToken() error {
 }
 
 func (v Vault) GetSecret(secretName string) (secret SecretData, err error) {
-	p := fmt.Sprintf("%s%s/%s", "/v1/secret/service/", v.AppRole.RoleId, secretName)
+	p := "/v1" + v.SecretMount + secretName
 
 	r, err := v.makeRequest("GET", p, "")
 	if err != nil {
@@ -73,7 +74,7 @@ func (v Vault) GetSecret(secretName string) (secret SecretData, err error) {
 }
 
 func (v Vault) ListSecrets() (secrets []string, err error) {
-	p := fmt.Sprintf("%s%s", "/v1/secret/service/", v.AppRole.RoleId)
+	p := "/v1" + v.SecretMount
 
 	r, err := v.makeRequest("LIST", p, "")
 	if err != nil {
@@ -110,7 +111,9 @@ func (v Vault) makeRequest(requestType string, path string, params string) (resp
 	defer r.Body.Close()
 
 	if r.StatusCode != 200 {
-		return Secret{}, fmt.Errorf("bad response code %d %s", r.StatusCode, r.Body)
+		b := new(bytes.Buffer)
+		b.ReadFrom(r.Body)
+		return Secret{}, fmt.Errorf("bad response code %d %s", r.StatusCode, b.String())
 	}
 
 	vaultResponse := Secret{}
